@@ -1,5 +1,6 @@
 import { FastifyInstance } from "fastify";
 import MealController from "../controllers/meal";
+import UserController from "../controllers/user";
 import { checkSessionIdExists } from "../middlewares/checkSessionIdExists";
 
 export async function mealRoutes(app: FastifyInstance) {
@@ -29,4 +30,7 @@ export async function mealRoutes(app: FastifyInstance) {
     { preHandler: [checkSessionIdExists] },
     MealController.delete,
   );
+
+  app.post("/signup", UserController.signUp);
+  app.post("/signin", UserController.signIn);
 }
