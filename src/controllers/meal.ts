@@ -69,6 +69,32 @@ class MealController {
       return handleError(response, error);
     }
   }
+
+  async patch(request: FastifyRequest, response: FastifyReply) {
+    try {
+      const { id } = request.params as { id: string };
+      const { name, description, date, isOnDiet } = patchMealSchema.parse(
+        request.body,
+      );
+      const dataToUpdate = {
+        ...(name !== undefined && { name }),
+        ...(description !== undefined && { description }),
+        ...(date !== undefined && { date_time: new Date(date) }),
+        ...(isOnDiet !== undefined && { is_on_diet: isOnDiet }),
+      };
+
+      const meal = await knex("meals")
+        .where({ id })
+        .update(dataToUpdate)
+        .returning("*");
+
+      return response
+        .status(200)
+        .send({ message: "Meal updated successfully", meal });
+    } catch (error) {
+      return handleError(response, error);
+    }
+  }
 }
 
 export default new MealController();
