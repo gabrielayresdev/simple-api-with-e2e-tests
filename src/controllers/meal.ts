@@ -187,6 +187,47 @@ class MealController {
       return handleError(response, error);
     }
   }
+
+  async getMetrics(request: FastifyRequest, response: FastifyReply) {
+    try {
+      const { sessionId } = request.cookies;
+
+      const meals = await knex("meals")
+        .where({ session_id: sessionId })
+        .orderBy("date_time", "asc")
+        .select("*");
+
+      const totalMeals = meals.length;
+      const mealsOnDiet = meals.filter((meal) => meal.is_on_diet).length;
+      const mealsOffDiet = meals.filter((meal) => !meal.is_on_diet).length;
+
+      let currentSequence = 0;
+      let bestSequence = 0;
+
+      for (const meal of meals) {
+        if (meal.is_on_diet) {
+          currentSequence++;
+          if (currentSequence > bestSequence) {
+            bestSequence = currentSequence;
+          }
+        } else {
+          currentSequence = 0;
+        }
+      }
+
+      return response.status(200).send({
+        message: "Metrics retrieved successfully",
+        result: {
+          totalMeals,
+          mealsOnDiet,
+          mealsOffDiet,
+          bestSequenceOnDiet: bestSequence,
+        },
+      });
+    } catch (error) {
+      return handleError(response, error);
+    }
+  }
 }
 
 export default new MealController();

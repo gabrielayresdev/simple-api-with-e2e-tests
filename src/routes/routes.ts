@@ -30,6 +30,11 @@ export async function mealRoutes(app: FastifyInstance) {
     { preHandler: [checkSessionIdExists] },
     MealController.delete,
   );
+  app.get(
+    "/metrics",
+    { preHandler: [checkSessionIdExists] },
+    MealController.getMetrics,
+  );
 
   app.post("/signup", UserController.signUp);
   app.post("/signin", UserController.signIn);
