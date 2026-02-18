@@ -20,6 +20,35 @@ const patchMealSchema = z.object({
 });
 
 class MealController {
+  async getAll(request: FastifyRequest, response: FastifyReply) {
+    try {
+      const meals = await knex("meals").select("*");
+      return response
+        .status(200)
+        .send({ message: "Meals retrieved successfully", result: meals });
+    } catch (error) {
+      return handleError(response, error);
+    }
+  }
+
+  async getById(request: FastifyRequest, response: FastifyReply) {
+    try {
+      const { id } = request.params as { id: string };
+
+      const meal = await knex("meals").where({ id }).first();
+
+      if (!meal) {
+        return response.status(404).send({ message: "Meal not found" });
+      }
+
+      return response
+        .status(200)
+        .send({ message: "Meal retrieved successfully", result: meal });
+    } catch (error) {
+      return handleError(response, error);
+    }
+  }
+
   async create(request: FastifyRequest, response: FastifyReply) {
     try {
       const { name, description, date, isOnDiet } = upsertMealSchema.parse(
@@ -36,7 +65,9 @@ class MealController {
         })
         .returning("*");
 
-      return response.status(201).send(meal[0]);
+      return response
+        .status(201)
+        .send({ message: "Meal created successfully", results: meal[0] });
     } catch (error) {
       return handleError(response, error);
     }
@@ -71,7 +102,7 @@ class MealController {
 
       return response
         .status(200)
-        .send({ message: "Meal updated successfully", meal });
+        .send({ message: "Meal updated successfully", result: meal[0] });
     } catch (error) {
       return handleError(response, error);
     }
@@ -104,7 +135,7 @@ class MealController {
 
       return response
         .status(200)
-        .send({ message: "Meal updated successfully", meal });
+        .send({ message: "Meal updated successfully", result: meal[0] });
     } catch (error) {
       return handleError(response, error);
     }
