@@ -45,6 +45,13 @@ class MealController {
   async update(request: FastifyRequest, response: FastifyReply) {
     try {
       const { id } = request.params as { id: string };
+
+      const mealExists = await knex("meals").where({ id }).first();
+
+      if (!mealExists) {
+        return response.status(404).send({ message: "Meal not found" });
+      }
+
       const { name, description, date, isOnDiet } = upsertMealSchema.parse(
         request.body,
       );
@@ -73,6 +80,13 @@ class MealController {
   async patch(request: FastifyRequest, response: FastifyReply) {
     try {
       const { id } = request.params as { id: string };
+
+      const mealExists = await knex("meals").where({ id }).first();
+
+      if (!mealExists) {
+        return response.status(404).send({ message: "Meal not found" });
+      }
+
       const { name, description, date, isOnDiet } = patchMealSchema.parse(
         request.body,
       );
