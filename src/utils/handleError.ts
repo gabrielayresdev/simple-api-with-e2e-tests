@@ -2,6 +2,8 @@ import { FastifyReply } from "fastify";
 import { z } from "zod";
 
 const handleError = (res: FastifyReply, error: unknown): FastifyReply => {
+  console.log(error);
+
   if (error instanceof z.ZodError) {
     return res.status(400).send({ error: error.message });
   }
