@@ -82,4 +82,73 @@ describe("User routes", () => {
         });
       });
   });
+
+  it("should not allow user creation without name or password", async () => {
+    await request(app.server)
+      .post("/signup")
+      .send({})
+      .expect(400)
+      .expect((res) => {
+        expect(res.body).toEqual(
+          expect.objectContaining({
+            message: "Invalid input",
+          }),
+        );
+      });
+  });
+
+  it("should be able to sign in with valid credentials", async () => {
+    await request(app.server).post("/signup").send({
+      name: "John Doe",
+      password: "123456",
+    });
+
+    await request(app.server)
+      .post("/signin")
+      .send({
+        name: "John Doe",
+        password: "123456",
+      })
+      .expect(200)
+      .expect((res) => {
+        const cookies = res.headers["set-cookie"][0];
+
+        expect(cookies).toBeDefined();
+        expect(cookies).toContain("sessionId=");
+      });
+  });
+
+  it("should not allow sign in with invalid credentials", async () => {
+    await request(app.server).post("/signup").send({
+      name: "John Doe",
+      password: "123456",
+    });
+
+    await request(app.server)
+      .post("/signin")
+      .send({
+        name: "John Doe",
+        password: "wrongpassword",
+      })
+      .expect(404)
+      .expect((res) => {
+        expect(res.body).toEqual({
+          message: "User not found",
+        });
+      });
+  });
+
+  it("should not allow sign in without name or password", async () => {
+    await request(app.server)
+      .post("/signin")
+      .send({})
+      .expect(400)
+      .expect((res) => {
+        expect(res.body).toEqual(
+          expect.objectContaining({
+            message: "Invalid input",
+          }),
+        );
+      });
+  });
 });

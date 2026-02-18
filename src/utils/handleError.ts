@@ -7,7 +7,13 @@ const handleError = (res: FastifyReply, error: unknown): FastifyReply => {
   console.log("=====================");
 
   if (error instanceof z.ZodError) {
-    return res.status(400).send({ error: error.message });
+    return res.status(400).send({
+      message: "Invalid input",
+      errors: error.issues.map((issue) => ({
+        field: issue.path.join("."),
+        message: issue.message,
+      })),
+    });
   }
 
   if (error instanceof Error) {
