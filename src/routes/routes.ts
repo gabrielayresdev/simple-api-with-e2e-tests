@@ -1,11 +1,32 @@
 import { FastifyInstance } from "fastify";
 import MealController from "../controllers/meal";
+import { checkSessionIdExists } from "../middlewares/checkSessionIdExists";
 
 export async function mealRoutes(app: FastifyInstance) {
-  app.get("/meals", MealController.getAll);
-  app.get("/meal/:id", MealController.getById);
   app.post("/meal", MealController.create);
-  app.put("/meal/:id", MealController.update);
-  app.patch("/meal/:id", MealController.patch);
-  app.delete("/meal/:id", MealController.delete);
+  app.get(
+    "/meals",
+    { preHandler: [checkSessionIdExists] },
+    MealController.getAll,
+  );
+  app.get(
+    "/meal/:id",
+    { preHandler: [checkSessionIdExists] },
+    MealController.getById,
+  );
+  app.put(
+    "/meal/:id",
+    { preHandler: [checkSessionIdExists] },
+    MealController.update,
+  );
+  app.patch(
+    "/meal/:id",
+    { preHandler: [checkSessionIdExists] },
+    MealController.patch,
+  );
+  app.delete(
+    "/meal/:id",
+    { preHandler: [checkSessionIdExists] },
+    MealController.delete,
+  );
 }

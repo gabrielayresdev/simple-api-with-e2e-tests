@@ -22,7 +22,10 @@ const patchMealSchema = z.object({
 class MealController {
   async getAll(request: FastifyRequest, response: FastifyReply) {
     try {
-      const meals = await knex("meals").select("*");
+      const { sessionId } = request.cookies;
+      const meals = await knex("meals")
+        .where({ session_id: sessionId })
+        .select("*");
       return response
         .status(200)
         .send({ message: "Meals retrieved successfully", result: meals });
@@ -34,8 +37,11 @@ class MealController {
   async getById(request: FastifyRequest, response: FastifyReply) {
     try {
       const { id } = request.params as { id: string };
+      const { sessionId } = request.cookies;
 
-      const meal = await knex("meals").where({ id }).first();
+      const meal = await knex("meals")
+        .where({ id, session_id: sessionId })
+        .first();
 
       if (!meal) {
         return response.status(404).send({ message: "Meal not found" });
@@ -88,8 +94,11 @@ class MealController {
   async update(request: FastifyRequest, response: FastifyReply) {
     try {
       const { id } = request.params as { id: string };
+      const { sessionId } = request.cookies;
 
-      const mealExists = await knex("meals").where({ id }).first();
+      const mealExists = await knex("meals")
+        .where({ id, session_id: sessionId })
+        .first();
 
       if (!mealExists) {
         return response.status(404).send({ message: "Meal not found" });
@@ -123,8 +132,11 @@ class MealController {
   async patch(request: FastifyRequest, response: FastifyReply) {
     try {
       const { id } = request.params as { id: string };
+      const { sessionId } = request.cookies;
 
-      const mealExists = await knex("meals").where({ id }).first();
+      const mealExists = await knex("meals")
+        .where({ id, session_id: sessionId })
+        .first();
 
       if (!mealExists) {
         return response.status(404).send({ message: "Meal not found" });
@@ -156,8 +168,11 @@ class MealController {
   async delete(request: FastifyRequest, response: FastifyReply) {
     try {
       const { id } = request.params as { id: string };
+      const { sessionId } = request.cookies;
 
-      const mealExists = await knex("meals").where({ id }).first();
+      const mealExists = await knex("meals")
+        .where({ id, session_id: sessionId })
+        .first();
 
       if (!mealExists) {
         return response.status(404).send({ message: "Meal not found" });
