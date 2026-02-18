@@ -95,6 +95,26 @@ class MealController {
       return handleError(response, error);
     }
   }
+
+  async delete(request: FastifyRequest, response: FastifyReply) {
+    try {
+      const { id } = request.params as { id: string };
+
+      const mealExists = await knex("meals").where({ id }).first();
+
+      if (!mealExists) {
+        return response.status(404).send({ message: "Meal not found" });
+      }
+
+      await knex("meals").where({ id }).delete();
+
+      return response
+        .status(200)
+        .send({ message: "Meal deleted successfully" });
+    } catch (error) {
+      return handleError(response, error);
+    }
+  }
 }
 
 export default new MealController();

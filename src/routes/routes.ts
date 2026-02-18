@@ -5,4 +5,5 @@ export async function mealRoutes(app: FastifyInstance) {
   app.post("/meal", MealController.create);
   app.put("/meal/:id", MealController.update);
   app.patch("/meal/:id", MealController.patch);
+  app.delete("/meal/:id", MealController.delete);
 }
