@@ -1,10 +1,14 @@
-import knexSetup, { Knex } from "knex";
+import { Knex, knex as setupKnex } from "knex";
+import { env } from "../src/env";
 
 export const config: Knex.Config = {
-  client: "sqlite",
-  connection: {
-    filename: "db/app.db",
-  },
+  client: env.DATABASE_CLIENT,
+  connection:
+    env.DATABASE_CLIENT === "sqlite"
+      ? {
+          filename: env.DATABASE_URL,
+        }
+      : env.DATABASE_URL,
   useNullAsDefault: true,
   migrations: {
     extension: "ts",
@@ -12,4 +16,4 @@ export const config: Knex.Config = {
   },
 };
 
-export const knex = knexSetup(config);
+export const knex = setupKnex(config);

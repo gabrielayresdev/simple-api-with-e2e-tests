@@ -36,21 +36,13 @@ class UserController {
     try {
       const { name, password } = userSchema.parse(request.body);
 
-      let sessionId = request.cookies.sessionId;
-
       const existingUser = await knex("users").where({ name }).first();
 
       if (existingUser) {
         return response.status(400).send({ message: "User already exists" });
       }
 
-      const existingId = await knex("users").where({ id: sessionId }).first();
-
-      if (existingId) {
-        return response
-          .status(400)
-          .send({ message: "Session ID already exists" });
-      }
+      let sessionId = request.cookies.sessionId;
 
       if (!sessionId) {
         sessionId = randomUUID();
@@ -59,6 +51,14 @@ class UserController {
           path: "/",
           maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
         });
+      } else {
+        const existingId = await knex("users").where({ id: sessionId }).first();
+
+        if (existingId) {
+          return response
+            .status(400)
+            .send({ message: "Session ID already exists" });
+        }
       }
 
       const user = await knex("users")
@@ -67,7 +67,7 @@ class UserController {
           name,
           password,
         })
-        .returning("*");
+        .returning(["id", "name"]);
 
       return response
         .status(201)
