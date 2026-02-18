@@ -55,6 +55,17 @@ class MealController {
         request.body,
       );
 
+      let sessionId = request.cookies.sessionId;
+
+      if (!sessionId) {
+        sessionId = randomUUID();
+
+        response.setCookie("sessionId", sessionId, {
+          path: "/",
+          maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+        });
+      }
+
       const meal = await knex("meals")
         .insert({
           id: randomUUID(),
@@ -62,6 +73,7 @@ class MealController {
           description,
           date_time: new Date(date),
           is_on_diet: isOnDiet,
+          session_id: sessionId,
         })
         .returning("*");
 
